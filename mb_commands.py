@@ -106,7 +106,7 @@ class MovieBot(commands.Cog):
             movieData = self.ia.getFilmData(title)
             if self.ia.alreadyExists(movieData, self.movieQueue) == True:
                 self.selectedMovie = self.movieQueue.index(movieData)
-                await ctx.send("```css\nNext up is changed to \n" + self.__filmFormat(self.movieQueue[selectedMovie]) + "```")
+                await ctx.send("```css\nNext up is changed to \n" + self.__filmFormat(self.movieQueue[self.selectedMovie]) + "```")
         except Exception:
             await ctx.send("```Movie cannot be found```")
 
@@ -133,11 +133,11 @@ class MovieBot(commands.Cog):
                 raise myExceptions.AlreadyExists
             self.movieQueue.append(movieData)
             await ctx.send("```css" + self.__filmFormat(movieData) + "```\nAdded to the watchlist")
+            self.__saveAll()        
         except myExceptions.CannotFindFilm:
             await ctx.send("```Cannot find movie: " + title + "```")
         except myExceptions.AlreadyExists:
             await ctx.send("```Movie is already in the watchlist```")
-        self.__saveAll()        
 
     @commands.command('remove', help="Removes a movie from the watchlist\n!mn remove {watchlist number}")
     async def remove(self, ctx, arg: int):
