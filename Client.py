@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from os import path
 
-time.sleep(30)
+time.sleep(10)
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')

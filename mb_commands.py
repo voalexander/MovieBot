@@ -37,7 +37,7 @@ class MovieBot(commands.Cog):
             regUsers = file.readline().split("(@@@)")[:-1]
             self.registeredUsers = regUsers
 
-            file.close()
+            file.close()    
 
 
     def __saveAll(self):
@@ -241,7 +241,7 @@ class MovieBot(commands.Cog):
             self.registeredUsers = regUsers
 
             file.close()
-            ctx.send("```Refreshed```")
+            await ctx.send("```Refreshed```")
 
     @commands.command('listregistered',help="Lists the registered users")
     async def listRegistered(self, ctx):
@@ -250,4 +250,4 @@ class MovieBot(commands.Cog):
             for x in self.registeredUsers:
                 toPrint += str(self.bot.get_user(int(x)))
                 toPrint += "\n"
-            ctx.send(str(toPrint))
+            await ctx.send(str(toPrint))
