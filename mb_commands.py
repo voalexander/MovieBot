@@ -92,5 +92,5 @@ class MovieBot(commands.Cog):
         try:
             movieData = self.ia.getFilmData(title)
             await ctx.send("```css" + self.__filmFormat(movieData) + "```")
-        except CannotFindFilm:
+        except myExceptions.CannotFindFilm:
             await ctx.send("```Cannot find movie: " + title + "```")
