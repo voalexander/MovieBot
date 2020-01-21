@@ -173,6 +173,7 @@ class MovieBot(commands.Cog):
 
     @commands.command('register',help='Register for notifications')
     async def register(self, ctx):
+        self.__getData()
         if str(ctx.author.id) not in self.registeredUsers:
             await ctx.send(f"```css\n{ctx.author} registered!```")
             self.registeredUsers.append(ctx.author.id)
@@ -182,6 +183,7 @@ class MovieBot(commands.Cog):
         
     @commands.command('unregister', help='Unregister for notifications')
     async def unregister(self, ctx):
+        self.__getData()
         for x in self.registeredUsers:
             if str(x) == str(ctx.author.id):
                 await ctx.send(f"```css\n{ctx.author} unregistered```")
