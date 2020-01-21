@@ -153,12 +153,13 @@ class MovieBot(commands.Cog):
         
     @commands.command('unregister', help='Unregister for notifications')
     async def unregister(self, ctx):
-        if str(ctx.author.id) in self.registeredUsers:
-            await ctx.send(f"```css\n{ctx.author} unregistered```")
-            self.registeredUsers.remove(str(ctx.author.id))
-            self.__saveAll()
-        else:
-            await ctx.send("```css\nYou were never registered```")
+        for x in self.registeredUsers:
+            if str(x) == str(ctx.author.id):
+                await ctx.send(f"```css\n{ctx.author} unregistered```")
+                self.registeredUsers.remove(str(ctx.author.id))
+                self.__saveAll()
+                return
+        await ctx.send("```css\nYou were never registered```")
     
     @commands.command('announce', help='Alex only permission')
     async def announce(self, ctx):
