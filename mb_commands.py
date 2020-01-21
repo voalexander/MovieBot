@@ -2,6 +2,7 @@ import discord
 import os.path
 import datetime
 import myExceptions
+import asyncio
 from datetime import timedelta
 from discord.ext import commands
 from os import path
@@ -57,6 +58,20 @@ class MovieBot(commands.Cog):
     def __filmFormat(self, movieData):
         fData = "\n[" + movieData[0] + "]\t #IMDb:" + movieData[1] + "\nPlot: " + movieData[2]
         return fData
+
+    def __convert_timedelta(self, duration):
+        days, seconds = duration.days, duration.seconds
+        hours = days * 24 + seconds // 3600
+        minutes = (seconds % 3600) // 60
+        seconds = (seconds % 60)
+        toPrint = ""
+        if days > 0:
+            toPrint += str(days) + " day(s), " + str(hours) + " hours(s), and " + str(minutes) + " minute(s)"
+        elif hours > 0:
+            toPrint += str(hours) + " hours(s), and " + str(minutes) + " minute(s)"
+        else:
+            toPrint += str(minutes) + " minute(s)"
+        return toPrint
 
     @commands.command('time', help="Shows when movie night is\n!mn time")
     async def time(self, ctx):
@@ -175,16 +190,17 @@ class MovieBot(commands.Cog):
         else:
             await ctx.send("```css\nnope```")
 
-    def __convert_timedelta(self, duration):
-        days, seconds = duration.days, duration.seconds
-        hours = days * 24 + seconds // 3600
-        minutes = (seconds % 3600) // 60
-        seconds = (seconds % 60)
-        toPrint = ""
-        if days > 0:
-            toPrint += str(days) + " day(s), " + str(hours) + " hours(s), and " + str(minutes) + " minute(s)"
-        elif hours > 0:
-            toPrint += str(hours) + " hours(s), and " + str(minutes) + " minute(s)"
-        else:
-            toPrint += str(minutes) + " minute(s)"
-        return toPrint
+    @commands.command('autoannounce', help="Alex only permission\nCan't be turned off lmao")
+    async def autoannounce(self, ctx, arg):
+        if str(ctx.author.id) == "154422225275977728":
+            if arg == "on":
+                await ctx.send("```css\n[Autoannounce ON]```")
+                await asyncio.sleep((self.movieTime - datetime.datetime.now()).seconds - 1800)
+                tt = self.__convert_timedelta(self.movieTime - datetime.datetime.now())
+                toPrint = "```css\n[The movie is now " + tt + " away]\n\n"
+                toPrint += "We are watching\n"
+                toPrint += self.__filmFormat(self.movieQueue[self.selectedMovie])
+                toPrint += "```"
+                for user in self.registeredUsers:
+                    toPrint += self.bot.get_user(int(user)).mention + " "
+                await ctx.send(toPrint)
