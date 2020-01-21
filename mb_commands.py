@@ -242,3 +242,12 @@ class MovieBot(commands.Cog):
 
             file.close()
             ctx.send("```Refreshed```")
+
+    @commands.command('listregistered',help="Lists the registered users")
+    async def listRegistered(self, ctx):
+        if str(ctx.author.id) == "154422225275977728":
+            toPrint = ""
+            for x in self.registeredUsers:
+                toPrint += str(self.bot.get_user(int(x)))
+                toPrint += "\n"
+            ctx.send(str(toPrint))
