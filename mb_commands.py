@@ -82,7 +82,7 @@ class MovieBot(commands.Cog):
             await ctx.send("```css\n[Movie Night is on " + str(timeP) + " CST].\n\nWe have no planned movies right now```")
         else:
             tt = self.__convert_timedelta(self.movieTime - datetime.datetime.now())
-            await ctx.send("```css\n[Movie Night is on " + str(timeP) + " CST].[\n" + tt + " away]\n\nWe plan to watch\n" + self.__filmFormat(self.movieQueue[self.selectedMovie]) + "```")
+            await ctx.send("```css\n[Movie Night is on " + str(timeP) + " CST].\n[" + tt + " away]\n\nWe plan to watch\n" + self.__filmFormat(self.movieQueue[self.selectedMovie]) + "```")
 
     @commands.command('setTime', help="Sets the movie night time\n!mn setTime MM/DD 00:00\nUses 24hour time\nDEFAULT TIMEZONE IS CST")
     async def setTime(self, ctx, date, time):
@@ -93,7 +93,7 @@ class MovieBot(commands.Cog):
         else:
             try:
                 newDate = datetime.datetime(2020, int(dateFirst[0]), int(dateFirst[1]), int(dateSecond[0]), int(dateSecond[1]))
-                await ctx.send("```css\nDate changed to [" + newDate.strftime("%A, %B %d at %I:%M") + " CST]```")
+                await ctx.send("```css\nDate changed to [" + newDate.strftime("%A, %B %d at %I:%M %p") + " CST]```")
                 self.movieTime = newDate
             except Exception:
                 await ctx.send("```Invalid date time```")

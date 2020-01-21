@@ -5,9 +5,12 @@ import pickle
 import atexit
 import imdb_stuff
 import mb_commands
+import time
 from dotenv import load_dotenv
 from discord.ext import commands
 from os import path
+
+time.sleep(30)
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
