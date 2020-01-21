@@ -218,3 +218,26 @@ class MovieBot(commands.Cog):
                 for user in self.registeredUsers:
                     toPrint += self.bot.get_user(int(user)).mention + " "
                 await ctx.send(toPrint)
+
+    @commands.command('refreshData',help="i will kill you if you use this")
+    async def refreshData(self, ctx):
+        if path.exists("/home/pi/MovieBot/data.pk1") == True:
+            file = open("/home/pi/MovieBot/data.pk1", "r")
+            queue = file.readline()
+            films = queue.split("(||)")[:-1]
+            for data in films:
+                filmData = data.split("(@@)")
+                self.movieQueue.append(filmData)
+
+            time = file.readline()
+            date = time.split(" ")
+            dateFirst = date[0].split("/")
+            dateSecond = date[1].split(":")
+            self.movieTime = datetime.datetime(2020, int(dateFirst[0]), int(dateFirst[1]), int(dateSecond[0]), int(dateSecond[1].rsplit('\n')[0]))
+
+            self.selectedMovie = int(file.readline())
+
+            regUsers = file.readline().split("(@@@)")[:-1]
+            self.registeredUsers = regUsers
+
+            file.close()
