@@ -107,6 +107,7 @@ class MovieBot(commands.Cog):
             if self.ia.alreadyExists(movieData, self.movieQueue) == True:
                 self.selectedMovie = self.movieQueue.index(movieData)
                 await ctx.send("```css\nNext up is changed to \n" + self.__filmFormat(self.movieQueue[self.selectedMovie]) + "```")
+                self.__saveAll()
         except Exception:
             await ctx.send("```Movie cannot be found```")
 
@@ -140,15 +141,18 @@ class MovieBot(commands.Cog):
             await ctx.send("```Movie is already in the watchlist```")
 
     @commands.command('remove', help="Removes a movie from the watchlist\n!mn remove {watchlist number}")
-    async def remove(self, ctx, arg: int):
+    async def remove(self, ctx, *args):
+        title = ""
+        for x in args:
+            title = title + " " + x
         try:
-            await ctx.send("```css\n[" + self.movieQueue[arg - 1][0] + "] removed```")
-            del self.movieQueue[arg - 1]
+            movieData = self.ia.getFilmData(title)
+            if self.ia.alreadyExists(movieData, self.movieQueue) == True:
+                await ctx.send("```css\n[" + self.movieQueue[self.movieQueue.index(movieData)][0] + "] removed```")
+                del self.movieQueue[self.movieQueue.index(movieData)]
+                self.__saveAll()
         except Exception:
-            await ctx.send(arg <= len(self.movieQueue))
-            await ctx.send(str(len(self.movieQueue)))
-            await ctx.send("```Invalid number\n!mn remove {watchlist number}```")
-        self.__saveAll()        
+            await ctx.send("```Movie cannot be found```")
 
     @commands.command('search', help='Seaches imdb for a movie\n!mn search moviename')
     async def search(self, ctx, *args):
