@@ -62,7 +62,7 @@ class MovieBot(commands.Cog):
     def __convert_timedelta(self, duration):
         days, seconds = duration.days, duration.seconds
         hours = days * 24 + seconds // 3600
-        hours = hours - (days * 25)
+        hours = hours - (days * 24)
         minutes = (seconds % 3600) // 60
         seconds = (seconds % 60)
         toPrint = ""
@@ -81,7 +81,8 @@ class MovieBot(commands.Cog):
         if len(self.movieQueue) == 0:
             await ctx.send("```css\n[Movie Night is on " + str(timeP) + " CST].\n\nWe have no planned movies right now```")
         else:
-            await ctx.send("```css\n[Movie Night is on " + str(timeP) + " CST].\n\nWe plan to watch\n" + self.__filmFormat(self.movieQueue[self.selectedMovie]) + "```")
+            tt = self.__convert_timedelta(self.movieTime - datetime.datetime.now())
+            await ctx.send("```css\n[Movie Night is on " + str(timeP) + " CST].[\n" + tt + " away]\n\nWe plan to watch\n" + self.__filmFormat(self.movieQueue[self.selectedMovie]) + "```")
 
     @commands.command('setTime', help="Sets the movie night time\n!mn setTime MM/DD 00:00\nUses 24hour time\nDEFAULT TIMEZONE IS CST")
     async def setTime(self, ctx, date, time):
