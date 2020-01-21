@@ -1,5 +1,4 @@
 # Intro Client to MovieBot
-
 import os
 import discord
 import pickle
@@ -8,9 +7,11 @@ import imdb_stuff
 import mb_commands
 from dotenv import load_dotenv
 from discord.ext import commands
+from os import path
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
+
 
 bot = commands.Bot(command_prefix='!mn ')
 

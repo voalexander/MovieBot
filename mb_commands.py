@@ -1,7 +1,9 @@
 import discord
+import os.path
 import datetime
 import myExceptions
 from discord.ext import commands
+from os import path
 
 class MovieBot(commands.Cog):
     def __init__(self, bot, imdb):
@@ -10,6 +12,42 @@ class MovieBot(commands.Cog):
         self.movieQueue = []
         self.movieTime = datetime.datetime.now()
         self.selectedMovie = 0
+        self.__getData()
+
+    def __getData(self):
+        if path.exists("data.pk1") == True:
+            file = open("data.pk1", "r")
+            queue = file.readline()
+            films = queue.split("(||)")[:-1]
+            for data in films:
+                filmData = data.split("(@@)")
+                print(str(filmData))
+                self.movieQueue.append(filmData)
+
+            time = file.readline()
+            print(time)
+            date = time.split(" ")
+            print(date)
+            dateFirst = date[0].split("/")
+            dateSecond = date[1].split(":")
+            print(dateFirst)
+            print(dateSecond)
+            self.movieTime = datetime.datetime(2020, int(dateFirst[0]), int(dateFirst[1]), int(dateSecond[0]), int(dateSecond[1].rsplit('\n')[0]))
+
+            self.selectedMovie = int(file.readline())
+
+
+    def __saveAll(self):
+        print("Saving...")
+        file = open("data.pk1", "w+")
+        for x in self.movieQueue:
+            file.write(str(x[0]) + "(@@)" + str(x[1]) + "(@@)" + str(x[2]) + "(||)")
+        file.write("\n")
+        file.write(self.movieTime.strftime("%m/%d %H:%M"))
+        file.write("\n")
+        file.write(str(self.selectedMovie))
+        file.close()
+        print("Saving done")
 
     def __filmFormat(self, movieData):
         fData = "\n[" + movieData[0] + "]\t #IMDb:" + movieData[1] + "\nPlot: " + movieData[2]
@@ -37,6 +75,7 @@ class MovieBot(commands.Cog):
                 self.movieTime = newDate
             except Exception:
                 await ctx.send("```Invalid date time```")
+        self.__saveAll()
 
     @commands.command('changenext', help="Changes the next up movie\n!mn change next {watchlist number}")
     async def changeSelection(self, ctx, arg: int):
@@ -45,6 +84,7 @@ class MovieBot(commands.Cog):
             self.selectedMovie = arg - 1
         except Exception:
             await ctx.send("```Invalid number```")
+        self.__saveAll()        
 
     @commands.command('watchlist', help='Displays the next few movies\n!mn watchlist')
     async def watchlist(self, ctx):
@@ -73,6 +113,7 @@ class MovieBot(commands.Cog):
             await ctx.send("```Cannot find movie: " + title + "```")
         except myExceptions.AlreadyExists:
             await ctx.send("```Movie is already in the watchlist```")
+        self.__saveAll()        
 
     @commands.command('remove', help="Removes a movie from the watchlist\n!mn remove {watchlist number}")
     async def remove(self, ctx, arg: int):
@@ -83,6 +124,7 @@ class MovieBot(commands.Cog):
             await ctx.send(arg <= len(self.movieQueue))
             await ctx.send(str(len(self.movieQueue)))
             await ctx.send("```Invalid number\n!mn remove {watchlist number}```")
+        self.__saveAll()        
 
     @commands.command('search', help='Seaches imdb for a movie\n!mn search moviename')
     async def search(self, ctx, *args):
