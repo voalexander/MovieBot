@@ -62,6 +62,7 @@ class MovieBot(commands.Cog):
     def __convert_timedelta(self, duration):
         days, seconds = duration.days, duration.seconds
         hours = days * 24 + seconds // 3600
+        hours = hours - (days * 25)
         minutes = (seconds % 3600) // 60
         seconds = (seconds % 60)
         toPrint = ""
@@ -76,7 +77,7 @@ class MovieBot(commands.Cog):
     @commands.command('time', help="Shows when movie night is\n!mn time")
     async def time(self, ctx):
         mt = self.movieTime
-        timeP = mt.strftime("%A, %B %w at %I:%M")
+        timeP = mt.strftime("%A, %B %d at %I:%M")
         if len(self.movieQueue) == 0:
             await ctx.send("```css\n[Movie Night is on " + str(timeP) + " CST].\n\nWe have no planned movies right now```")
         else:
@@ -91,7 +92,7 @@ class MovieBot(commands.Cog):
         else:
             try:
                 newDate = datetime.datetime(2020, int(dateFirst[0]), int(dateFirst[1]), int(dateSecond[0]), int(dateSecond[1]))
-                await ctx.send("```css\nDate changed to [" + newDate.strftime("%A, %B %w at %I:%M") + " CST]```")
+                await ctx.send("```css\nDate changed to [" + newDate.strftime("%A, %B %d at %I:%M") + " CST]```")
                 self.movieTime = newDate
             except Exception:
                 await ctx.send("```Invalid date time```")
