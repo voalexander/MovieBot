@@ -149,6 +149,8 @@ class MovieBot(commands.Cog):
             movieData = self.ia.getFilmData(title)
             if self.ia.alreadyExists(movieData, self.movieQueue) == True:
                 await ctx.send("```css\n[" + self.movieQueue[self.movieQueue.index(movieData)][0] + "] removed```")
+                if self.selectedMovie == self.movieQueue.index(movieData):
+                    self.selectedMovie = 0
                 del self.movieQueue[self.movieQueue.index(movieData)]
                 self.__saveAll()
         except Exception:
