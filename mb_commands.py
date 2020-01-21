@@ -155,6 +155,8 @@ class MovieBot(commands.Cog):
                     self.selectedMovie = 0
                 del self.movieQueue[self.movieQueue.index(movieData)]
                 self.__saveAll()
+            else:
+                await ctx.send("```Movie cannot be found```")
         except Exception:
             await ctx.send("```Movie cannot be found```")
 
