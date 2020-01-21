@@ -18,8 +18,8 @@ class MovieBot(commands.Cog):
         self.__getData()
 
     def __getData(self):
-        if path.exists("data.pk1") == True:
-            file = open("data.pk1", "r")
+        if path.exists("/home/pi/MovieBot/data.pk1") == True:
+            file = open("/home/pi/MovieBot/data.pk1", "r")
             queue = file.readline()
             films = queue.split("(||)")[:-1]
             for data in films:
@@ -42,7 +42,7 @@ class MovieBot(commands.Cog):
 
     def __saveAll(self):
         print("Saving...")
-        file = open("data.pk1", "w+")
+        file = open("/home/pi/MovieBot/data.pk1", "w+")
         for x in self.movieQueue:
             file.write(str(x[0]) + "(@@)" + str(x[1]) + "(@@)" + str(x[2]) + "(||)")
         file.write("\n")
