@@ -241,3 +241,4 @@ class MovieBot(commands.Cog):
             self.registeredUsers = regUsers
 
             file.close()
+            ctx.send("```Refreshed```")
