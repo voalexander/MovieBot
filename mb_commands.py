@@ -220,8 +220,18 @@ class MovieBot(commands.Cog):
                 for user in self.registeredUsers:
                     toPrint += self.bot.get_user(int(user)).mention + " "
                 await ctx.send(toPrint)
+    @commands.command('listregistered',help="Lists the registered users")
+    async def listRegistered(self, ctx):
+        if str(ctx.author.id) == "154422225275977728":
+            toPrint = "```css\n"
+            for x in self.registeredUsers:
+                toPrint += str(self.bot.get_user(int(x)))
+                toPrint += "\n"
+            toPrint += "```"
+            await ctx.send(str(toPrint))
 
-    @commands.command('refreshData',help="i will kill you if you use this")
+
+"""     @commands.command('refreshData',help="i will kill you if you use this")
     async def refreshData(self, ctx):
         if path.exists("/home/pi/MovieBot/data.pk1") == True:
             file = open("/home/pi/MovieBot/data.pk1", "r")
@@ -243,13 +253,5 @@ class MovieBot(commands.Cog):
             self.registeredUsers = regUsers
 
             file.close()
-            await ctx.send("```Refreshed```")
+            await ctx.send("```Refreshed```") """
 
-    @commands.command('listregistered',help="Lists the registered users")
-    async def listRegistered(self, ctx):
-        if str(ctx.author.id) == "154422225275977728":
-            toPrint = ""
-            for x in self.registeredUsers:
-                toPrint += str(self.bot.get_user(int(x)))
-                toPrint += "\n"
-            await ctx.send(str(toPrint))
