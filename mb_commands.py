@@ -91,20 +91,24 @@ class MovieBot(commands.Cog):
         else:
             try:
                 newDate = datetime.datetime(2020, int(dateFirst[0]), int(dateFirst[1]), int(dateSecond[0]), int(dateSecond[1]))
-                await ctx.send("```css\nDate changed to [" + newDate.strftime("%A, %B %w at %I:%M") + "] CST```")
+                await ctx.send("```css\nDate changed to [" + newDate.strftime("%A, %B %w at %I:%M") + " CST]```")
                 self.movieTime = newDate
             except Exception:
                 await ctx.send("```Invalid date time```")
         self.__saveAll()
 
     @commands.command('changenext', help="Changes the next up movie\n!mn change next {watchlist number}")
-    async def changeSelection(self, ctx, arg: int):
+    async def changeSelection(self, ctx, *args):
+        title = ""
+        for x in args:
+            title = title + " " + x
         try:
-            await ctx.send("```css\nNext up is changed to \n" + self.__filmFormat(self.movieQueue[arg - 1]) + "```")
-            self.selectedMovie = arg - 1
+            movieData = self.ia.getFilmData(title)
+            if self.ia.alreadyExists(movieData, self.movieQueue) == True:
+                self.selectedMovie = self.movieQueue.index(movieData)
+                await ctx.send("```css\nNext up is changed to \n" + self.__filmFormat(self.movieQueue[selectedMovie]) + "```")
         except Exception:
-            await ctx.send("```Invalid number```")
-        self.__saveAll()        
+            await ctx.send("```Movie cannot be found```")
 
     @commands.command('watchlist', help='Displays the next few movies\n!mn watchlist')
     async def watchlist(self, ctx):
