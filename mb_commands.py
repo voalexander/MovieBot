@@ -259,17 +259,20 @@ class MovieBot(commands.Cog):
             title = title + " " + x
         try:
             movieData = self.ia.getFilmData(title)
-            if self.ia.alreadyExists(movieData, self.movieQueue) == True:
-                await ctx.send("```css\n[" + self.movieQueue[self.movieQueue.index(movieData)][0] + "] added to watched films```")
-                if self.selectedMovie == self.movieQueue.index(movieData):
-                    self.selectedMovie = 0
-                self.movieWatched.append(self.movieQueue[self.movieQueue.index(movieData)])
-                del self.movieQueue[self.movieQueue.index(movieData)]
-                self.__saveAll()
+            if self.ia.alreadyExists(movieData, self.movieWatched) == True:
+                await ctx.send("```cssMovie already in watched```")
             else:
-                await ctx.send("```css\n[" + movieData[0] + "] added to watched films")
-                self.movieWatched.append(movieData)
-                self.__saveAll()
+                if self.ia.alreadyExists(movieData, self.movieQueue) == True:
+                    await ctx.send("```css\n[" + self.movieQueue[self.movieQueue.index(movieData)][0] + "] added to watched films```")
+                    if self.selectedMovie == self.movieQueue.index(movieData):
+                        self.selectedMovie = 0
+                    self.movieWatched.append(self.movieQueue[self.movieQueue.index(movieData)])
+                    del self.movieQueue[self.movieQueue.index(movieData)]
+                    self.__saveAll()
+                else:
+                    await ctx.send("```css\n[" + movieData[0] + "] added to watched films")
+                    self.movieWatched.append(movieData)
+                    self.__saveAll()
         except Exception:
             await ctx.send("```Movie cannot be found```")
 
