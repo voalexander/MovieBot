@@ -38,6 +38,11 @@ class MovieBot(commands.Cog):
             regUsers = file.readline().split("(@@@)")[:-1]
             self.registeredUsers = regUsers
 
+            watchedMovies = file.readline().split("(||)")[:-1]
+            for data in watchedMovies:
+                filmData = data.split("(@@)")
+                self.movieWatched.append(filmData)
+
             file.close()    
 
 
@@ -53,6 +58,9 @@ class MovieBot(commands.Cog):
         file.write("\n")
         for x in self.registeredUsers:
             file.write(str(x) + "(@@@)")
+        file.write("\n")
+        for x in self.movieWatched:
+            file.write(str(x[0]) + "(@@)" + str(x[1]) + "(@@)" + str(x[2]) + "(||)")
         file.close()
         print("Saving done")
 
@@ -100,7 +108,7 @@ class MovieBot(commands.Cog):
                 await ctx.send("```Invalid date time```")
         self.__saveAll()
 
-    @commands.command('changenext', help="Changes the next up movie\n!mn change next {watchlist number}")
+    @commands.command('changenext', help="Changes the next up movie\n!mn change next { moviename }")
     async def changeSelection(self, ctx, *args):
         title = ""
         for x in args:
@@ -172,7 +180,7 @@ class MovieBot(commands.Cog):
         except myExceptions.CannotFindFilm:
             await ctx.send("```Cannot find movie: " + title + "```")
 
-    @commands.command('register',help='Register for notifications')
+    @commands.command('register',help='Register for notifications\n!mn register')
     async def register(self, ctx):
         self.__getData()
         if str(ctx.author.id) not in self.registeredUsers:
@@ -182,7 +190,7 @@ class MovieBot(commands.Cog):
         else:
             await ctx.send(f"```css\n{ctx.author} is already registered```")
         
-    @commands.command('unregister', help='Unregister for notifications')
+    @commands.command('unregister', help='Unregister for notifications\n!mn unregister')
     async def unregister(self, ctx):
         self.__getData()
         for x in self.registeredUsers:
@@ -193,7 +201,7 @@ class MovieBot(commands.Cog):
                 return
         await ctx.send("```css\nYou were never registered```")
     
-    @commands.command('announce', help='Alex only permission')
+    @commands.command('announce', help='Alex only permission\nstop snooping')
     async def announce(self, ctx):
         if str(ctx.author.id) == "154422225275977728":
             tt = self.__convert_timedelta(self.movieTime - datetime.datetime.now())
@@ -222,7 +230,7 @@ class MovieBot(commands.Cog):
                     toPrint += self.bot.get_user(int(user)).mention + " "
                 await ctx.send(toPrint)
     
-    @commands.command('listregistered',help="Lists the registered users")
+    @commands.command('listregistered',help="Lists the registered users\n!mn listregistered")
     async def listRegistered(self, ctx):
         toPrint = "```css\n"
         for x in self.registeredUsers:
@@ -231,7 +239,7 @@ class MovieBot(commands.Cog):
         toPrint += "```"
         await ctx.send(str(toPrint))
 
-    @commands.command('watchedlist',help='Gets all the watched movies')
+    @commands.command('watchedlist',help='Gets all the watched movies\n!mn watchedlist')
     async def listWatched(self, ctx):
         self.__getData()
         num = 1
@@ -240,11 +248,11 @@ class MovieBot(commands.Cog):
             toPrint += self.__filmFormat(title) + "\n\n"
             num += 1
         if num == 1:
-            toPrint = "```css\nEmpty - add movies with !mn watched { film }"
+            toPrint = "```css\nEmpty - add movies with !mn watched { moviename }"
         toPrint += "```"
         await ctx.send(toPrint)
     
-    @commands.command('watched',help='Mark movie as watched')
+    @commands.command('watched',help='Mark movie as watched\n!mn watched { moviename }')
     async def watched(self, ctx, *args):
         title = ""
         for x in args:
@@ -259,7 +267,9 @@ class MovieBot(commands.Cog):
                 del self.movieQueue[self.movieQueue.index(movieData)]
                 self.__saveAll()
             else:
-                await ctx.send("```Movie cannot be found```")
+                await ctx.send("```css\n[" + movieData[0] + "] added to watched films")
+                self.movieWatched.append(movieData)
+                self.__saveAll()
         except Exception:
             await ctx.send("```Movie cannot be found```")
 
