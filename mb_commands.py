@@ -106,10 +106,10 @@ class MovieBot(commands.Cog):
         return toPrint
 
     #@private_method: Convers args to a title
-    def __getTitle(self, *args):
+    def __getTitle(self, *args: str):
         title = ""
         for x in args:
-            title = title + " " + x
+            title = title + " " + str(x)
         return title
 
     #@bot_command: Prints time of upcoming movie
