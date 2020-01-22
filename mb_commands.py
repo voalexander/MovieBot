@@ -12,6 +12,7 @@ class MovieBot(commands.Cog):
         self.bot = bot
         self.ia = imdb
         self.movieQueue = []
+        self.movieWatched = []
         self.movieTime = datetime.datetime.now()
         self.selectedMovie = 0
         self.registeredUsers = []
@@ -229,6 +230,37 @@ class MovieBot(commands.Cog):
                 toPrint += "\n"
             toPrint += "```"
             await ctx.send(str(toPrint))
+
+    @commands.command('watchedlist',help='Gets all the watched movies')
+    async def listWatched(self, ctx):
+        num = 1
+        toPrint = "```css\n"
+        for title in self.movieWatched:
+            toPrint += self.__filmFormat(title) + "\n\n"
+            num += 1
+        if num == 1:
+            toPrint = "```css\nEmpty - add movies with !mn watched { film }"
+        toPrint += "```"
+        await ctx.send(toPrint)
+    
+    @commands.command('watched',help='Mark movie as watched')
+    async def watched(self, ctx, *args):
+        title = ""
+        for x in args:
+            title = title + " " + x
+        try:
+            movieData = self.ia.getFilmData(title)
+            if self.ia.alreadyExists(movieData, self.movieQueue) == True:
+                await ctx.send("```css\n[" + self.movieQueue[self.movieQueue.index(movieData)][0] + "] added to watched films```")
+                if self.selectedMovie == self.movieQueue.index(movieData):
+                    self.selectedMovie = 0
+                self.movieWatched.append(self.movieQueue[self.movieQueue.index(movieData)])
+                del self.movieQueue[self.movieQueue.index(movieData)]
+                self.__saveAll()
+            else:
+                await ctx.send("```Movie cannot be found```")
+        except Exception:
+            await ctx.send("```Movie cannot be found```")
 
 
 """     @commands.command('refreshData',help="i will kill you if you use this")
