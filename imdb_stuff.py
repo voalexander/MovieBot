@@ -1,6 +1,6 @@
 import imdb
 from imdb import IMDb
-import myExceptions
+import imdbExceptions
 
 class IMDB(object):
     def __init__(self):
@@ -15,7 +15,7 @@ class IMDB(object):
             data.append(str(filmData.get("rating")))
             data.append(filmData.get("plot")[0].split("::")[0]) # Split to remove imdb author
         except Exception:
-            raise myExceptions.CannotFindFilm
+            raise imdbExceptions.CannotFindFilm
         return data
 
     def alreadyExists(self, film, existingEntries):
