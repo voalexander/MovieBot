@@ -260,7 +260,7 @@ class MovieBot(commands.Cog):
         try:
             movieData = self.ia.getFilmData(title)
             if self.ia.alreadyExists(movieData, self.movieWatched) == True:
-                await ctx.send("```cssMovie already in watched```")
+                await ctx.send("```css\nMovie already in watched```")
             else:
                 if self.ia.alreadyExists(movieData, self.movieQueue) == True:
                     await ctx.send("```css\n[" + self.movieQueue[self.movieQueue.index(movieData)][0] + "] added to watched films```")
@@ -270,7 +270,7 @@ class MovieBot(commands.Cog):
                     del self.movieQueue[self.movieQueue.index(movieData)]
                     self.__saveAll()
                 else:
-                    await ctx.send("```css\n[" + movieData[0] + "] added to watched films")
+                    await ctx.send("```css\n[" + movieData[0] + "] added to watched films```")
                     self.movieWatched.append(movieData)
                     self.__saveAll()
         except Exception:
