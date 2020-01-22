@@ -276,6 +276,24 @@ class MovieBot(commands.Cog):
         except Exception:
             await ctx.send("```Movie cannot be found```")
 
+    @commands.command('removewatched', help="Removes a movie from the watchlist\n!mn remove {watchlist number}")
+    async def removeWatched(self, ctx, *args):
+        title = ""
+        for x in args:
+            title = title + " " + x
+        try:
+            movieData = self.ia.getFilmData(title)
+            if self.ia.alreadyExists(movieData, self.movieWatched) == True:
+                await ctx.send("```css\n[" + self.movieWatched[self.movieWatched.index(movieData)][0] + "] removed```")
+                if self.selectedMovie == self.movieWatched.index(movieData):
+                    self.selectedMovie = 0
+                del self.movieWatched[self.movieWatched.index(movieData)]
+                self.__saveAll()
+            else:
+                await ctx.send("```Movie cannot be found```")
+        except Exception:
+            await ctx.send("```Movie cannot be found```")
+
 
 """     @commands.command('refreshData',help="i will kill you if you use this")
     async def refreshData(self, ctx):
