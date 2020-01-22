@@ -119,7 +119,7 @@ class MovieBot(commands.Cog):
         num = 1
         toPrint = "```css\n"
         for title in self.movieQueue:
-            toPrint += str(num) + ": " + self.__filmFormat(title) + "\n\n"
+            toPrint += self.__filmFormat(title) + "\n\n"
             num += 1
         if num == 1:
             toPrint = "```css\nEmpty - add movies with !mn add { film }"
@@ -221,18 +221,19 @@ class MovieBot(commands.Cog):
                 for user in self.registeredUsers:
                     toPrint += self.bot.get_user(int(user)).mention + " "
                 await ctx.send(toPrint)
+    
     @commands.command('listregistered',help="Lists the registered users")
     async def listRegistered(self, ctx):
-        if str(ctx.author.id) == "154422225275977728":
-            toPrint = "```css\n"
-            for x in self.registeredUsers:
-                toPrint += str(self.bot.get_user(int(x)))
-                toPrint += "\n"
-            toPrint += "```"
-            await ctx.send(str(toPrint))
+        toPrint = "```css\n"
+        for x in self.registeredUsers:
+            toPrint += str(self.bot.get_user(int(x)))
+            toPrint += "\n"
+        toPrint += "```"
+        await ctx.send(str(toPrint))
 
     @commands.command('watchedlist',help='Gets all the watched movies')
     async def listWatched(self, ctx):
+        self.__getData()
         num = 1
         toPrint = "```css\n"
         for title in self.movieWatched:
