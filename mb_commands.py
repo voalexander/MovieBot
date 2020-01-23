@@ -323,3 +323,8 @@ class MovieBot(commands.Cog):
         self.__saveAll()
         if valid == True:
             await ctx.send("```" + arg + "cleared```")
+
+    @commands.command('refresh', help="Refresh data")
+    async def refresh(self, ctx):
+        self.__getData()
+        await ctx.send("```Refreshed```")
