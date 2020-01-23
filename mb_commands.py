@@ -1,7 +1,7 @@
 import discord
 import os.path
 import datetime
-import myExceptions
+import imdbExceptions
 import asyncio
 from datetime import timedelta
 from discord.ext import commands
@@ -169,13 +169,13 @@ class MovieBot(commands.Cog):
         try:
             movieData = self.ia.getFilmData(title)
             if self.ia.alreadyExists(movieData, self.movieQueue) == True:
-                raise myExceptions.AlreadyExists
+                raise imdbExceptions.AlreadyExists
             self.movieQueue.append(movieData)
             await ctx.send("```css" + self.__filmFormat(movieData) + "```\nAdded to the watchlist")
             self.__saveAll()        
-        except myExceptions.CannotFindFilm:
+        except imdbExceptions.CannotFindFilm:
             await ctx.send("```Cannot find movie: " + title + "```")
-        except myExceptions.AlreadyExists:
+        except imdbExceptions.AlreadyExists:
             await ctx.send("```Movie is already in the watchlist```")
 
     #@bot_command: Finds and removes a movie from the watchlist
@@ -202,7 +202,7 @@ class MovieBot(commands.Cog):
         try:
             movieData = self.ia.getFilmData(title)
             await ctx.send("```css" + self.__filmFormat(movieData) + "```")
-        except myExceptions.CannotFindFilm:
+        except imdbExceptions.CannotFindFilm:
             await ctx.send("```Cannot find movie: " + title + "```")
 
     #@bot_command: Registers a user for notifications
