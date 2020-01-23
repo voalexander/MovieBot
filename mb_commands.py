@@ -3,6 +3,7 @@ import os.path
 import datetime
 import imdbExceptions
 import asyncio
+import sys
 from datetime import timedelta
 from discord.ext import commands
 from os import path
@@ -57,7 +58,6 @@ class MovieBot(commands.Cog):
 
     #@private_method: Saves all the data to an external file
     def __saveAll(self):
-        print("Saving...")
         file = open("/home/pi/MovieBot/data.pk1", "w+")
         # Movies watched
         for x in self.movieQueue:
@@ -81,7 +81,6 @@ class MovieBot(commands.Cog):
         for x in self.movieWatched:
             file.write(str(x[0]) + "(@@)" + str(x[1]) + "(@@)" + str(x[2]) + "(||)")
         file.close()
-        print("Saving done")
 
     #@private_method: Takes moviedata and returns formatted string
     def __filmFormat(self, movieData):
@@ -109,8 +108,9 @@ class MovieBot(commands.Cog):
     def __getTitle(self, *args: str):
         title = ""
         for x in args:
-            title = title + " " + str(x)
-        return title
+            for y in x:
+                title += " " + y
+        return str(title)
 
     #@bot_command: Prints time of upcoming movie
     @commands.command('time', help="Shows when movie night is\n!mn time")
@@ -122,22 +122,6 @@ class MovieBot(commands.Cog):
             tt = self.__getTimeTill()
             await ctx.send("```css\n[Movie Night is on " + str(timeP) + " CST].\n[" + tt + " away]\n\nWe plan to watch\n" + self.__filmFormat(self.movieQueue[self.selectedMovie]) + "```")
 
-    #@bot_command: Sets the time of movienight
-    @commands.command('setTime', help="Sets the movie night time\n!mn setTime MM/DD 00:00\nUses 24hour time\nDEFAULT TIMEZONE IS CST")
-    async def setTime(self, ctx, date, time):
-        dateFirst = date.split("/")
-        dateSecond = time.split(":")
-        if len(dateFirst) != 2 or len(dateSecond) != 2:
-            await ctx.send("```Invalid date time. MM/DD 00:00```")
-        else:
-            try:
-                newDate = datetime.datetime(2020, int(dateFirst[0]), int(dateFirst[1]), int(dateSecond[0]), int(dateSecond[1]))
-                await ctx.send("```css\nDate changed to [" + newDate.strftime("%A, %B %d at %I:%M %p") + " CST]```")
-                self.movieTime = newDate
-                self.__saveAll()
-            except Exception:
-                await ctx.send("```Invalid date time```")
-
     #@bot_command: Changes the movie to watch at the next movienight
     @commands.command('changenext', help="Changes the next up movie\n!mn change next { moviename }")
     async def changeSelection(self, ctx, *args):
@@ -148,7 +132,8 @@ class MovieBot(commands.Cog):
                 self.selectedMovie = self.movieQueue.index(movieData)
                 await ctx.send("```css\nNext up is changed to \n" + self.__filmFormat(self.movieQueue[self.selectedMovie]) + "```")
                 self.__saveAll()
-        except Exception:
+        except Exception as e:
+            print(type(e))
             await ctx.send("```Movie cannot be found```")
 
     #@bot_command: Outputs a list of movies to watch
@@ -188,11 +173,12 @@ class MovieBot(commands.Cog):
                 if self.selectedMovie == self.movieQueue.index(movieData):
                     self.selectedMovie = 0
                 del self.movieQueue[self.movieQueue.index(movieData)]
-                await ctx.send("```css\n[" + self.movieQueue[self.movieQueue.index(movieData)][0] + "] removed```")
+                await ctx.send("```css\n[" + movieData[0] + "] removed```")
                 self.__saveAll()
             else:
                 await ctx.send("```Movie not in list```")
-        except Exception:
+        except Exception as e:
+            print(type(e))
             await ctx.send("```Movie cannot be found```")
 
     #@bot_command: Searches imdb and returns movie data
@@ -224,6 +210,23 @@ class MovieBot(commands.Cog):
             self.__saveAll()
         else:
             await ctx.send("```css\nYou were never registered```")
+    
+    #@bot_command: Sets the time of movienight
+    @commands.command('setTime', help="Sets the movie night time\n!mn setTime MM/DD 00:00\nUses 24hour time\nDEFAULT TIMEZONE IS CST")
+    async def setTime(self, ctx, date, time):
+        dateFirst = date.split("/")
+        dateSecond = time.split(":")
+        if len(dateFirst) != 2 or len(dateSecond) != 2:
+            await ctx.send("```Invalid date time. MM/DD 00:00```")
+        else:
+            try:
+                newDate = datetime.datetime(2020, int(dateFirst[0]), int(dateFirst[1]), int(dateSecond[0]), int(dateSecond[1]))
+                await ctx.send("```css\nDate changed to [" + newDate.strftime("%A, %B %d at %I:%M %p") + " CST]```")
+                self.movieTime = newDate
+                self.__saveAll()
+            except Exception as e:
+                print(type(e))
+                await ctx.send("```Invalid date time```")
     
     #@bot_command: Announces the movietime, movie, and pings registered users
     @commands.command('announce', help='Alex only permission\nstop snooping')
@@ -259,6 +262,29 @@ class MovieBot(commands.Cog):
         toPrint += "```"
         await ctx.send(str(toPrint))
 
+    #@bot_command: Adds movie to watched movies list
+    @commands.command('watched',help='Mark movie as watched\n!mn watched { moviename }')
+    async def watched(self, ctx, *args):
+        title = self.__getTitle(args)
+        try:
+            movieData = self.ia.getFilmData(title)
+            if movieData in self.movieWatched:
+                await ctx.send("```css\nMovie already in watched```")
+            else:
+                if movieData in self.movieQueue:
+                    if self.selectedMovie == self.movieQueue.index(movieData):
+                        self.selectedMovie = 0
+                    self.movieWatched.append(movieData)
+                    del self.movieQueue[self.movieQueue.index(movieData)]
+                    await ctx.send("```css\n[" + movieData[0] + "] added to watched films```")
+                else:
+                    self.movieWatched.append(movieData)
+                    await ctx.send("```css\n[" + movieData[0] + "] added to watched films```")
+                self.__saveAll()
+        except Exception as e:
+            print(type(e))
+            await ctx.send("```Movie cannot be found```")
+
     #@bot_command: Prints out a list of watched movies
     @commands.command('watchedlist',help='Gets all the watched movies\n!mn watchedlist')
     async def listWatched(self, ctx):
@@ -270,61 +296,56 @@ class MovieBot(commands.Cog):
         toPrint += "```"
         await ctx.send(toPrint)
 
-    #@bot_command: Adds movie to watched movies list
-    @commands.command('watched',help='Mark movie as watched\n!mn watched { moviename }')
-    async def watched(self, ctx, *args):
-        title = self.__getTitle()
-        try:
-            movieData = self.ia.getFilmData(title)
-            if self.ia.alreadyExists(movieData, self.movieWatched) == True:
-                await ctx.send("```css\nMovie already in watched```")
-            else:
-                if self.ia.alreadyExists(movieData, self.movieQueue) == True:
-                    if self.selectedMovie == self.movieQueue.index(movieData):
-                        self.selectedMovie = 0
-                    self.movieWatched.append(movieData)
-                    del self.movieQueue[self.movieQueue.index(movieData)]
-                    await ctx.send("```css\n[" + movieData[0] + "] added to watched films```")
-                else:
-                    self.movieWatched.append(movieData)
-                    await ctx.send("```css\n[" + movieData[0] + "] added to watched films```")
-                self.__saveAll()
-        except Exception:
-            await ctx.send("```Movie cannot be found```")
-
     #@bot_command: Removes a watched movie from the list
     @commands.command('removewatched', help="Removes a movie from the watchlist\n!mn remove {watchlist number}")
     async def removeWatched(self, ctx, *args):
-        title = self.__getTitle()
+        title = self.__getTitle(args)
         try:
             movieData = self.ia.getFilmData(title)
-            if self.ia.alreadyExists(movieData, self.movieWatched) == True:
+            if movieData in self.movieWatched:
                 del self.movieWatched[self.movieWatched.index(movieData)]
                 await ctx.send("```css\n[" + movieData[0] + "] removed```")
                 self.__saveAll()
             else:
                 await ctx.send("```Movie not in list```")
-        except Exception:
+        except Exception as e:
+            print(type(e))
             await ctx.send("```Movie cannot be found```")
 
     @commands.command('clear', help="Clears certain list")
     async def clear(self, ctx, arg):
-        valid = False
-        if arg == "watchlist":
-            self.movieQueue = []
-            self.selectedMovie = 0
-            valid = True
-        elif arg == "watchedlist":
-            self.movieWatched = []
-            valid = True
-        elif arg == "registeredlist":
-            self.registeredUsers = []
-            valid = True
-        self.__saveAll()
-        if valid == True:
-            await ctx.send("```" + arg + "cleared```")
+        if str(ctx.author.id) == "154422225275977728":
+            valid = False
+            if arg == "watchlist":
+                self.movieQueue = []
+                self.selectedMovie = 0
+                valid = True
+            elif arg == "watchedlist":
+                self.movieWatched = []
+                valid = True
+            elif arg == "registeredlist":
+                self.registeredUsers = []
+                valid = True
+            self.__saveAll()
+            if valid == True:
+                await ctx.send("```" + arg + "cleared```")
 
     @commands.command('refresh', help="Refresh data")
     async def refresh(self, ctx):
-        self.__getData()
-        await ctx.send("```Refreshed```")
+        if str(ctx.author.id) == "154422225275977728":
+            self.__getData()
+            await ctx.send("```Refreshed```")
+
+    @commands.command('help')
+    async def help(self,ctx):
+        try:
+            cmds_desc = '```css\n'
+            hidden = ["refresh", "clear", "autoannounce", "announce", "setTime", "listregistered", "help"]
+            for y in self.bot.walk_commands():
+                if y.name not in hidden:
+                    cmds_desc += ("[!mn {}]\n{}\n\n".format(y.name, y.help))
+            cmds_desc += "```"
+            await ctx.send(cmds_desc)
+        except Exception as e:
+            print(type(e))
+            pass

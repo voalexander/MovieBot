@@ -10,13 +10,14 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from os import path
 
-time.sleep(10)
+#time.sleep(10)
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 
 
 bot = commands.Bot(command_prefix='!mn ')
+bot.remove_command('help')
 
 @bot.event
 async def on_ready():
