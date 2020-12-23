@@ -1,0 +1,11 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "MovieBot.db",
+            "database": "${workspaceFolder:MovieBot}/MovieBot.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}
