@@ -481,11 +481,11 @@ class MovieBot(commands.Cog):
         embed=discord.Embed(title="{} {}/{}".format(title, j, int(len(results)/10.1) + 1), description="", color=0xF79202)
         for result in results:
             # Avoiding max embed limit by sending two messages
-            if i == 10:
+            if i % 10 == 0 and i != 0:
                 embed.set_footer(text="Requested by {}".format(ctx.author))
                 await ctx.send(embed=embed)
                 j += 1
-                embed=discord.Embed(title="{} {}/{}".format(title, j, int(len(results)/25.1) + 1), description="", color=0xF79202)
+                embed=discord.Embed(title="{} {}/{}".format(title, j, int(len(results)/10.1) + 1), description="", color=0xF79202)
                 embed.set_footer(text="Requested by {}".format(ctx.author))
                 embed.clear_fields()
             print(result)
