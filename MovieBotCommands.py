@@ -381,7 +381,11 @@ class MovieBot(commands.Cog):
             self.dCursor.execute("SELECT * FROM RegisteredUsers")
             results = self.dCursor.fetchall()
             for result in results:
-                toPrint += self.bot.get_user(int(result[1])).mention + " "
+                try:
+                    member = await ctx.guild.fetch_member(int(result[1]))
+                    toPrint += member.mention + " "
+                except Exception:
+                    continue
             await ctx.send(toPrint)
         else:
             await ctx.send("```css\nnope```")
